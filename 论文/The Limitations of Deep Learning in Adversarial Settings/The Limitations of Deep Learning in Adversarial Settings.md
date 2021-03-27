@@ -119,3 +119,32 @@ $J_{F}(X)=[\dfrac{\partial F(X)}{\partial x_1},\dfrac{\partial F(X)}{\partial x_
 
 那么针对如上的式子，用可视化的手段可以得出在0和1之间有一道非常明显的鸿沟
 ![图 1](../../images/4342336c2a3d4da4d6794eb73d517bea3667293d51909bc3c6a32b3b2b5fb207.png)  
+
+因此，在敌手使用正向导数时，要专注于给定输入值的较大导数，让寻找更加有效，最终导向更小的扭曲
+
+由上可得：
+
+- 输入小的变动会导致神经网络输出极大变化
+- 并不是所有的输入域都适合找到对抗样本
+- 前向导数减小了对抗样本的寻找空间
+  
+### Generalizing to Deep Neural Networks
+
+将上面的原理推广到 DNN模型中，对于任意无环的DNN
+![图 1](../../images/3c4b5c06f823c81f5cf2a90fd541f50b34ec2be41d4dafbe39ae2ce37b2013c1.png)  
+
+![图 2](../../images/b0efc57f47763935c990d01b23fc4c8aa45717119d01f77047683b9a9859382a.png)  
+
+其基本步骤为：
+
+1. 计算前向导数$J_F(X^*)$
+2. 基于前向导数构建一个显著图$S$
+3. 通过$\theta$修改输入特征$i_{max}$
+4. 重复123直到获得$Y^*$或者到达最大扰动$\Upsilon$
+
+#### Forward Derivative of a Deep Neural Network
+
+第一步就是对给定的样本$X$计算前向导数，如下
+
+
+
