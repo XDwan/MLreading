@@ -104,7 +104,18 @@ $$Z_{0}(X) = \omega_{31}h_1(X)+\omega_{32}h_2(X)+b_3$$
 输入偏差为$b_1,b_2,b_3(null)$
 
 应得输出为$F(X) = x_1 \bigwedge x_2$ 其中$X = (x_1,x_2)$ 非整数会化成整数
+从网络模型中可以得到$F(X)=Y$
+然后对$X$添加一点扰动$\delta X$得到$X^*$($X^*$与$X$非常相似)，但$F(X^*)=Y^*\neq Y$
+
+因此这个问题就变成如下最小化公式：找到最小的$\delta X$使得模型误判：
+$$arg \; \underset{{\delta X} }{\min}\;\rVert \delta X \rVert \;s.t. F(X+\delta X)=Y^* \qquad(1)$$
+
 
 这些扰动可以通过优化或者手动解决，但这些解决方法不适用与DNN，因其通常是非凸与非线性，因此提出一种基于向前导数的算法
 
-$J_{X}=[\dfrac{\partial F(X)}{\partial x_1},\dfrac{\partial F(X)}{\partial x_2}]$
+将前向导数定义为神经网络在训练过程中学习的函数F的雅可比矩阵（Jacobian matrix）。
+例如上面模型，可将雅各比矩阵化为如下形式
+$J_{F}(X)=[\dfrac{\partial F(X)}{\partial x_1},\dfrac{\partial F(X)}{\partial x_2}]$
+
+那么针对如上的式子，用可视化的手段可以得出在0和1之间有一道非常明显的鸿沟
+![图 1](../../images/4342336c2a3d4da4d6794eb73d517bea3667293d51909bc3c6a32b3b2b5fb207.png)  
