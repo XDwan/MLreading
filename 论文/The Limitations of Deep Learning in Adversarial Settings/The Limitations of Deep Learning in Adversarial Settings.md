@@ -115,7 +115,7 @@ $$arg \; \underset{{\delta X} }{\min}\;\rVert \delta X \rVert \;s.t. F(X+\delta 
 
 将前向导数定义为神经网络在训练过程中学习的函数F的雅可比矩阵（Jacobian matrix）。
 例如上面模型，可将雅各比矩阵化为如下形式
-$J_{F}(X)=[\dfrac{\partial F(X)}{\partial x_1},\dfrac{\partial F(X)}{\partial x_2}]$
+$$J_{F}(X)=[\dfrac{\partial F(X)}{\partial x_1},\dfrac{\partial F(X)}{\partial x_2}]$$
 
 那么针对如上的式子，用可视化的手段可以得出在0和1之间有一道非常明显的鸿沟
 ![图 1](../../images/4342336c2a3d4da4d6794eb73d517bea3667293d51909bc3c6a32b3b2b5fb207.png)  
@@ -146,5 +146,50 @@ $J_{F}(X)=[\dfrac{\partial F(X)}{\partial x_1},\dfrac{\partial F(X)}{\partial x_
 
 第一步就是对给定的样本$X$计算前向导数，如下
 
+$J_{F}(X)=[\dfrac{\partial F(X)}{\partial X}] =[\dfrac{\partial F_{j}(X)}{\partial x_i}]_{i\in 1...M,j\in 1...N}$
 
+这个与神经网络的反向传播很像，但是我们只取其网络的导数而不是损失函数，根据其特征取值而不是网络参数。
 
+因此不是反向梯度，而是正向梯度，这能使我们更好的发现导致明显输出变化的输入组件
+
+从第一个DNN的隐藏层开始，可以根据输入组件来区分第一个隐藏层的输出，然后根据先前的依次递归后面的隐藏层。
+
+$$
+\dfrac{{\partial H_k(X)}}{\partial x_i} = [\dfrac{{\partial f_{k,p}(W_{k,p}\cdot H_{k-1}+b_{k,p})}}{\partial x_i}]_{p\in 1...m_k}
+$$
+
+其中
+
+- $H_k$是隐藏层$k$的输出向量
+- $f_{k,j}$是第$k$层神经元$j$的激活函数
+- 在$k\in 1..n+1$的隐藏层或者输出层的每一个神经元$p$都和第$k-1$层以向量$W_{k,p}$的权重进行连接（通过相应地定义权重矩阵，我们可以定义完全或稀疏连接的夹层，从而建模各种架构）
+- $b_{k,p}$是第$k$层神经元$p$的偏差
+
+应用以上规则，应用链式法则，我们可以得到
+
+$$
+\dfrac{{\partial H_k(X)}}{\partial x_i}\rvert_{p\in 1...m_k} = (W_{k,p}\cdot H_{k-1})\times \frac{\partial f_{k,p}}{\partial x_i}(W_{k,p}\cdot H_{k-1}+b_{k,p})
+$$
+
+于是我们能够计算$\frac{\partial H_n}{\partial x_i}$
+神经元$j$的输出是计算如下表达式：
+$$
+F_j(X)=f_{n+1,j}(W_{n+1,p}\cdot H_{n}+b_{n+1,p})
+$$
+
+因此，我们再次运用链式法则来获得$J_F[i,j](X)$
+
+$$
+\dfrac{{\partial F_j(X)}}{\partial x_i} = (W_{n+1,j}\cdot \frac{\partial H_n}{\partial x_i})\times \frac{\partial f_{n+1,j}}{\partial x_i}(W_{n+1,j}\cdot H_{n}+b_{n+1,j})
+$$
+
+其中，除了$\frac{\partial H_n}{\partial x_i}$以外都是已知的，我们就得到了DNN前向导数的组件$(i,j)$的表达式
+
+因此网络$F$可以通过连续地区分从输入层到输出层的层间来计算任何输入$X$的正向导数$J_F(X)$。
+
+#### Adversarial Saliency Maps
+对抗性显著性映射的定义，是为了适应特定问题的对抗性目标。例如，一个用作分类器的网络，其输出是一个跨类的概率向量，其中最终预测的类值对应于概率最高的分量
+
+$$
+label(X)=arg\, \underset{j}{max}F_j(X)
+$$
